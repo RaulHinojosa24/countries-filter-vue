@@ -11,49 +11,115 @@
 </head>
 
 <body>
-  <header>
-    <a href="#" class="logo">Where in the world?</a>
-    <button class="btn-toggle">
-      <i class="fa-solid fa-moon"></i><span>Dark Mode</span>
-    </button>
-  </header>
-
-  <main id="app">
-    <div class="main-container">
-      <section class="search-filter-container">
-        <div class="search-field">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input class="search-input" type="text" placeholder="Search for a country..." />
-        </div>
-
-        <select name="regions" id="regions" aria-label="regions">
-          <option value="">Filter by Region</option>
-          <option value="all">All</option>
-          <option value="africa">Africa</option>
-          <option value="americas">America</option>
-          <option value="asia">Asia</option>
-          <option value="europe">Europe</option>
-          <option value="oceania">Oceania</option>
-        </select>
-      </section>
-
-      <div class="cards">
-        <div class="card card-nombreDelPais"> <!-- Pista pasa usar el v-for-->
-          <img class="flag" src="" alt="nombreDelPais flag" />
-          <div class="content">
-            <h3 class="name">NOMBRE</h3>
-            <div><span class="country-info">Population: </span><span class="population">NÚMERO DE HABITANTES</span>
+  <div id="app">
+    <div class="app" :class="!isDarkTheme ? 'light' : ''">
+      <header>
+        <a href="#" class="logo">Where in the world?</a>
+        <button class="btn-toggle" @click="isDarkTheme = !isDarkTheme">
+          <div v-if="isDarkTheme"><i class="fa-solid fa-moon"></i><span> Dark Mode</span></div>
+          <div v-else><i class="fa-solid fa-sun"></i><span> Light Mode</span></div>
+        </button>
+      </header>
+      <main>
+        <div class="main-container">
+          <section class="search-filter-container">
+            <div class="search-field">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input v-model="inputFilter" class="search-input" type="text" placeholder="Search for a country..." />
             </div>
-            <div><span class="country-info">Region: </span><span class="region">EUROPA? ASIA?</span></div>
-
-            <div><span class="country-info">Capital: </span><span class="capital">Madrid</span></div>
+            <select v-model="selectFilter" name="regions" id="regions" aria-label="regions">
+              <option value="">Filter by Region</option>
+              <option value="">All</option>
+              <option value="africa">Africa</option>
+              <option value="americas">America</option>
+              <option value="asia">Asia</option>
+              <option value="europe">Europe</option>
+              <option value="oceania">Oceania</option>
+            </select>
+          </section>
+          <div class="cards">
+            <div class="card card-nombreDelPais" v-for="country in filteredCountries" :key="country.numericCode"
+              @click="setModalCountry(country.alpha3Code)">
+              <img class="flag" :src="country.flag" :alt="country.name + ' flag'" />
+              <div class="content">
+                <h3 class="name">{{ country.name }}</h3>
+                <div><span class="country-info">Population: </span><span class="population">{{
+                    country.population.toLocaleString() }}</span>
+                </div>
+                <div><span class="country-info">Region: </span><span class="region">{{ country.region }}</span></div>
+                <div><span class="country-info">Capital: </span><span class="capital">{{ country.capital }}</span></div>
+              </div>
+            </div>
           </div>
+          <section class="modal country-info-page" :class="modalCountry ? 'open' : 'hidden'">
+            <div class="modal-content">
+              <button class="btn back-btn" @click="hideCountryModal">
+                <i class="fa-solid fa-arrow-left"></i>Back
+              </button>
+              <div class="country-details">
+                <img :src="modalCountry.flag" :alt="modalCountry.name + ' flag'">
+                <div class="country-content">
+                  <h3 class="modal-title">{{ modalCountry.name ? modalCountry.name : 'None' }}</h3>
+                  <div class="country-content-middle">
+                    <div class="content-middle-left">
+                      <div>
+                        <span class="native-name country-info">Native Name: </span>
+                        <span>{{ modalCountry.nativeName ? modalCountry.nativeName : 'None' }}</span>
+                      </div>
+                      <div>
+                        <span class="population country-info">Population: </span>
+                        <span>{{ modalCountry.population ? modalCountry.population.toLocaleString() : 'None' }}</span>
+                      </div>
+                      <div>
+                        <span class="region country-info">Region: </span>
+                        <span>{{ modalCountry.region ? modalCountry.region : 'None' }}</span>
+                      </div>
+                      <div>
+                        <span class="sub-region country-info">Sub Region: </span>
+                        <span>{{ modalCountry.subregion ? modalCountry.subregion: 'None' }}</span>
+                      </div>
+                      <div>
+                        <span class="capital country-info">Capital: </span>
+                        <span>{{ modalCountry.capital ? modalCountry.capital: 'None' }}</span>
+                      </div>
+                    </div>
+                    <div class="content-middle-right">
+                      <div>
+                        <span class="domain country-info">Top Level Domain: </span>
+                        <span>{{ modalCountry.topLevelDomain ? modalCountry.topLevelDomain.join(", "): 'None' }}</span>
+                      </div>
+                      <div>
+                        <span class="currency country-info">Currencies: </span>
+                        <span>{{ modalCountry.currencies ? (modalCountry.currencies.map(c => c.name).join(", ")) :
+                          'None'
+                          }}</span>
+                      </div>
+                      <div>
+                        <span class="language country-info">Languages: </span>
+                        <span>{{ modalCountry.languages ? modalCountry.languages.map(l => l.name).join(", "): 'None'
+                          }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="border-country-container">
+                    <span>Border Countries: </span>
+                    <div class="country-buttons">
+                      <p v-if="!modalCountry.borders">No border countries</p>
+                      <button class="btn" v-for="borderCountry in modalCountry.borders"
+                        @click="setModalCountry(borderCountry)">
+                        {{ borderCountry }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-      </div>
-
-      <section class="modal country-info-page"></section>
+      </main>
     </div>
-  </main>
+  </div>
+
   <script src="https://unpkg.com/vue@3"></script>
   <script src="main.js"></script>
 </body>

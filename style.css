@@ -14,7 +14,7 @@ html {
   line-height: 1.7;
 }
 
-body {
+.app {
   font-family: "Nunito Sans", sans-serif;
   --clr-body-background: hsl(207, 26%, 17%);
   --clr-card-background: hsl(209, 23%, 22%);
@@ -188,8 +188,6 @@ select {
   height: 100%;
   top: 0;
   left: 0;
-
-  visibility: hidden;
 }
 
 .country-details {
@@ -215,12 +213,6 @@ select {
   visibility: visible;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
 .btn {
   background: var(--clr-card-background);
   color: var(--clr-text);
@@ -233,6 +225,13 @@ select {
   margin-right: 1rem;
 }
 
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 3rem;
+}
+
 .modal.open {
   visibility: visible;
 }
@@ -242,10 +241,12 @@ select {
 }
 
 @media screen and (min-width: 900px) {
+
   /* MAIN */
   main {
     padding: 3rem 4rem;
   }
+
   /* search filter container  */
 
   .search-filter-container {
